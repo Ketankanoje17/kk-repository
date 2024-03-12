@@ -1,0 +1,215 @@
+ @PostMapping(path = "/getvahandetails", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<SuccessResponse<FetchDetailedRCResponse>> generatePDF(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestBody FetchDetailedRCRequest fetchDetailedRCRequest,
+            Principal principal) {
+
+            String file = new File("src/main/resources").getAbsolutePath();
+            FetchDetailedRCResponse detailedRCResponse = rcJasperserice.jasperCreate(file, fetchDetailedRCRequest);
+            SuccessResponse<FetchDetailedRCResponse> successResponse = new SuccessResponse<>(detailedRCResponse);
+            return ResponseEntity.ok().body(successResponse);
+
+
+
+
+
+
+client 
+
+package com.mahindrafinance.vahan.client;
+import com.mahindrafinance.vahan.exception.ConsonantNotFoundException;
+import com.mahindrafinance.vahan.exception.GovermentSourceNotFoundException;
+import com.mahindrafinance.vahan.exception.RCNotFoundException;
+import com.mahindrafinance.vahan.feign.RCFeignClient;
+import com.mahindrafinance.vahan.model.rc.FetchDetailedRCRequest;
+import com.mahindrafinance.vahan.model.rc.FetchDetailedRCResponse;
+import feign.FeignException;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+
+import java.util.Objects;
+
+@Log4j2
+@Component
+public class RcDetails {
+
+    @Autowired
+    TokenGeneration tokenGeneration;
+
+    @Autowired
+    RCFeignClient rCFeignClient;
+
+    public FetchDetailedRCResponse fetchDetailedRC(FetchDetailedRCRequest fetchDetailedRCRequest) {
+        log.info("Calling document details VAHAN API");
+
+        String bearerToken = tokenGeneration.getBearerToken();
+
+
+        HttpEntity<FetchDetailedRCRequest> requestBody = new HttpEntity<>(
+                fetchDetailedRCRequest, tokenGeneration.getHttpHeaders(bearerToken));
+
+        ResponseEntity<FetchDetailedRCResponse> fetchDetailedRCResponse;
+
+        try {
+            fetchDetailedRCResponse = rCFeignClient.getDetailedRC(requestBody.getBody());
+
+            if ("Y".equals(fetchDetailedRCRequest.getConsent()))
+            {
+                handleConsentGivenExceptions(Objects.requireNonNull(fetchDetailedRCResponse.getBody()));
+            }
+            log.info("Successfully received response from VAHAN API");
+            return fetchDetailedRCResponse.getBody();
+        } catch (FeignException.BadRequest exception) {
+            log.error("Feign Bad Request Exception: ", exception);
+            throw new ConsonantNotFoundException("Consent not provided");
+        } catch (RestClientException exception) {
+            log.error("Calling Document VAHAN API failed. Exception: ", exception);
+            throw new RestClientException("API Call to getVahanAPIDetailed failed ", exception);
+        }
+    }
+    private void handleConsentGivenExceptions(FetchDetailedRCResponse fetchDetailedRCResponse) {
+        if ("200".equals(fetchDetailedRCResponse.getStatusCode()) &&
+                "1001".equals(fetchDetailedRCResponse.getResult().getData().getCode())) {
+
+            throw new RCNotFoundException("RC does not exist");
+        }
+        else if ("200".equals(fetchDetailedRCResponse.getStatusCode()) &&
+                "1002".equals(fetchDetailedRCResponse.getResult().getData().getCode())) {
+            throw new RCNotFoundException("Vehicle record found in more than one RTO");
+        } else if ("500".equals(fetchDetailedRCResponse.getStatusCode()) &&
+                "UPSTREAM_INTERNAL_SERVER_ERROR".equals(fetchDetailedRCResponse.getError().getError().getCode())) {
+            throw new GovermentSourceNotFoundException("Upstream source/Government source internal server error. Please start the process again");
+        }
+    }
+
+}
+
+
+
+package com.mahindrafinance.vahan.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mahindrafinance.vahan.client.RcDetails;
+import com.mahindrafinance.vahan.client.TokenGeneration;
+import com.mahindrafinance.vahan.exception.ConsonantNotFoundException;
+import com.mahindrafinance.vahan.exception.GovermentSourceNotFoundException;
+import com.mahindrafinance.vahan.exception.RCNotFoundException;
+import com.mahindrafinance.vahan.model.rc.*;
+import jakarta.validation.Valid;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.security.Principal;
+import java.util.*;
+
+@Service
+@Log4j2
+public class RCJasperserice {
+
+    @Autowired
+    TokenGeneration tokenGeneration;
+
+
+    @Autowired
+    private RcDetails rcDetails;
+
+    @SneakyThrows
+    public FetchDetailedRCResponse jasperCreate(String fileP, FetchDetailedRCRequest fetchDetailedRCRequest) {
+
+        FetchDetailedRCResponse fetchDetailedRCResponse = rcDetails.fetchDetailedRC(fetchDetailedRCRequest);
+        Map<String, Object> mp = generatePdfCustom(fetchDetailedRCResponse, fetchDetailedRCRequest);
+
+        JasperReport jasperReportRelease2 = JasperCompileManager
+                .compileReport(fileP + File.separator + "jrxml" + File.separator + "rc.jrxml");
+
+        JasperPrint jasperPrintRelease2 = JasperFillManager.fillReport(jasperReportRelease2, mp, new JREmptyDataSource());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JRPdfExporter exporter = new JRPdfExporter();
+        List<JasperPrint> jasperPrintList = new ArrayList<>();
+        jasperPrintList.add(jasperPrintRelease2);
+        exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
+
+        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, out);
+        exporter.exportReport();
+        byte[] outputFile = null;
+        outputFile = out.toByteArray();
+        byte[] encode = Base64.getEncoder().encode(outputFile);
+        String result = new String(encode);
+        fetchDetailedRCResponse.getResult().setBytecode(result);
+        return fetchDetailedRCResponse;
+
+
+    }
+
+
+    private Map<String, Object> generatePdfCustom(FetchDetailedRCResponse rc, FetchDetailedRCRequest fetchDetailedRCRequest) {
+        Map<String, Object> map1 = new HashMap<>();
+        InsuranceRCData insuranceData = rc.getResult().getData().getRcData().getInsuranceData();
+
+        map1.put("rc", fetchDetailedRCRequest.getRC());
+        map1.put("policyNumber", insuranceData != null ? insuranceData.getPolicyNumber() : "");
+        map1.put("company", insuranceData != null ? insuranceData.getCompany() : "");
+        map1.put("insuranceExpiryDate", insuranceData != null ? insuranceData.getExpiryDate() : "");
+
+        PuccRCData puccData = rc.getResult().getData().getRcData().getPuccData();
+        map1.put("puccNuber", puccData != null ? puccData.getPuccNuber() : "");
+        map1.put("pucExpiryDate", puccData != null ? puccData.getExpiryDate() : "");
+
+        RCData rcData = rc.getResult().getData().getRcData();
+        map1.put("financier", rcData != null && rcData.getFinancier() != null ? rcData.getFinancier() : "");
+        map1.put("issueDate", rcData != null ? rcData.getIssueDate() : "");
+        map1.put("documentType", rcData != null ? rcData.getDocumentType() : "");
+        map1.put("expiryDate", rcData != null ? rcData.getExpiryDate() : "");
+        map1.put("registeredAt", rcData != null ? rcData.getRegisteredAt() : "");
+        map1.put("puccData", rcData != null ? rcData.getIssueDate() : "");
+
+        OwnerRCData ownerData = rc.getResult().getData().getRcData().getOwnerData();
+        map1.put("name", ownerData != null ? ownerData.getName() : "");
+        map1.put("presentAddress", ownerData != null ? ownerData.getPresentAddress() : "");
+        map1.put("permanentAddress", ownerData != null ? ownerData.getPermanentAddress() : "");
+        map1.put("fatherName", ownerData != null ? ownerData.getFatherName() : "");
+        map1.put("serial", ownerData != null ? ownerData.getSerial() : "");
+
+        VehicleRCData vehicleData = rc.getResult().getData().getRcData().getVehicleData();
+        map1.put("fuelType", vehicleData != null ? vehicleData.getFuelType() : "");
+        map1.put("chassisNumber", vehicleData != null ? vehicleData.getChassisNumber() : "");
+        map1.put("color", vehicleData != null ? vehicleData.getColor() : "");
+        map1.put("manufacturedDate", vehicleData != null ? vehicleData.getManufacturedDate() : "");
+        map1.put("engineNumber", vehicleData != null ? vehicleData.getEngineNumber() : "");
+        map1.put("cubicCapacity", vehicleData != null ? vehicleData.getCubicCapacity() : "");
+        map1.put("makerModel", vehicleData != null ? vehicleData.getMakerModel() : "");
+        map1.put("categoryDescription", vehicleData != null ? vehicleData.getCategoryDescription() : "");
+        map1.put("wheelbase", vehicleData != null ? vehicleData.getWheelbase() : "");
+        map1.put("makerDescription", vehicleData != null ? vehicleData.getMakerDescription() : "");
+        map1.put("bodyType", vehicleData != null ? vehicleData.getBodyType() : "");
+        map1.put("grossWeight", vehicleData != null ? vehicleData.getGrossWeight() : "");
+        map1.put("numberOfCylinders", vehicleData != null ? vehicleData.getNumberOfCylinders() : "");
+        map1.put("seatingCapacity", vehicleData != null ? vehicleData.getSeatingCapacity() : "");
+
+        return map1;
+    }
+
+}
+
+
+
