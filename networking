@@ -1,0 +1,86 @@
+Networking:
+provide: communication,sharing software, sharing file ,sharing info, information preservation,security,sharing hardware,sharing data
+
+LAN- Local Area Network
+  - 5 to 10 sysytem join and communicate only this 10 system cannot communicate extra system callled LAN. --LAN cable(Small range) ex:our wifi,mobile hotspot
+
+MAN-Metropolitian Area Network- we provide the network big area this network used big area called MAN ex:university,comapny organisation,hospital (Internet Service Provider)
+
+WAN-Wide Area Network -  we communicate worldwide called wide area network : ex : communicate A to b (www)
+
+
+
+----------------------------
+ISP(internet service provider) - Airtel,Vodafone,JIO                        1 byte  -   -      -
+IP - IP (internet protocol address) - 172.167.224.47  - 32 bits - 4 bytes (8 bits 8bits 8bits 8bits)
+
+IPV4                                                             IPV6
+version-4                                                        version-06
+address-size 32-bit numbers                                      128-bit numbers
+address-format - decimal                                          hexadecimal
+prefix -notation- 192.0.0.0/24                                   3ffe.2
+
+
+public  -  WAN -wide area network communicate that time used WAN 
+private - small range communication that time used private LAN
+static  -  static once used then this address register particular user
+dynamic - at a runtime allocated ip called dynamic
+
+
+MAC address -:Media Access Control Address -device identifier and network Interface controller using mac
+48 bits = 6 bytes
+0A:22:84:D5:65:V4
+organisation unique identifier:Network Interface Controller 
+
+
+what is port:
+ communication between one system to another system via IP address
+
+
+cmd - getmac
+   check details - mac lookeup
+
+
+One system communicate another system via IP address - source - destination is IP.
+
+ports - port provide speicifif IP address way to send and received using this port address.
+at a time only one port used cannot used same time same port  1 - 65535
+ -Path, Communication, Only an open port ,1-65535, one port at a time
+
+protocol - set of rule, How data is transmiited, Device Communication
+  - TCP                                                UDP
+  
+  
+  Application - >  Telnet ,smtp, pop3, FTP, NTP,HTTP,SNMP,DNS,SSH
+  Transport - TCP, UDP - core commuincation managment - any sysem communicate using this protocolIntermet -  IR ,ICMP,ARP,DHCP
+  Network Access - Ethernet,PPP,ADSL
+  
+  
+  URG - data container in the packet should should be processed immediately
+  FIN -  there will be no further transmission
+  RST - reset a connection
+  PSH - send all buffered data immediately
+  ACK- acknowledged the reciept of a packet
+  SYN - initiate a connection between hosts
+  
+  
+   TCP Three way handshake4
+   TCP session Termination
+   
+   
+ Working of Router:             public ip
+   - we are install broadband /\mac address   private ] provide range of Ip addresses
+                     |                                 192.1.0.84
+					                                   192.1.0.127
+		  connecting multiple system   :now provide this range of IP address defined  different different os or mobile system.
+		  
+		  
+   
+    
+  
+
+
+
+
+
+
