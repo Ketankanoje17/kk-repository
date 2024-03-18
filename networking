@@ -50,9 +50,10 @@ at a time only one port used cannot used same time same port  1 - 65535
 protocol - set of rule, How data is transmiited, Device Communication
   - TCP                                                UDP
   
-  
+  tcp/ip layer
   Application - >  Telnet ,smtp, pop3, FTP, NTP,HTTP,SNMP,DNS,SSH
   Transport - TCP, UDP - core commuincation managment - any sysem communicate using this protocolIntermet -  IR ,ICMP,ARP,DHCP
+  internet
   Network Access - Ethernet,PPP,ADSL
   
   
@@ -75,6 +76,58 @@ protocol - set of rule, How data is transmiited, Device Communication
 		  connecting multiple system   :now provide this range of IP address defined  different different os or mobile system.
 		  
 		  
+
+
+IP  -                        manually                                           AUTO
+                            open system settings, then                      DHCP -dynamic host control protocol - provide automation IP allocated
+						    provide IP                                      ARP -address Resolution protocol
+							
+	                                                     ISP
+														  |             router store public and private Ip range
+my computer system - private IP                         -> Router                                 -> Network
+search facebook                                         direclty come router-request come to      -> then go network and communicate
+
+commuincation :
+  public - > public
+  private -> private
+  private X-> public
+
+                                                      
+
+Request                                                  Response\
+
+HTTP Request:
+vg		
+
+
+DNS - Domain Name System
+   every website own private IP address  but every time not mind this ,so thats why we name provide this particular IP address then search on search Engine
+  
+
+OSI - open system interconnection model
+     - defined function
+    - 7  layer
+    - 	
+							
+		  
+		/bin - basic programs - command run then this commnad information store
+        /sbin - system program (fdisk,systemctl,mkfs,etc..)\
+        /etc  - configuration file
+        /temp - temporary file
+		/user/bin -application (apt,nmap etc)
+		/user/share - application support and data files
+		/home       -  personal direcotries
+		/root       -  admin
+		
+		commands - >
+		
+		
+		In Linux os any install software not complete that time occur any error that time this resolve error using
+		
+		apt install --fix-broken   - half install software
+		
+		
+        		
    
     
   
