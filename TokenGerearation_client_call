@@ -1,0 +1,127 @@
+//config
+package com.mmfsl.api.configrations;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ConfigurationProperties("token-api")
+@Component
+public class TokenGenerationConfiguration {
+    private String token_url;
+    private String access_token;
+    private String authorization;
+    private String grant_type;
+}
+// generation
+
+
+
+package com.mmfsl.api.client;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmfsl.api.configrations.TAsfdcurl;
+import com.mmfsl.api.configrations.TokenGenerationConfiguration;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+
+@Log4j2
+@Component
+public class TokenGeneration {
+
+    private final TokenGenerationConfiguration tokenGenerationConfiguration;
+
+
+    @Autowired
+    public TokenGeneration(TokenGenerationConfiguration tokenGenerationConfiguration) {
+        this.tokenGenerationConfiguration = tokenGenerationConfiguration;
+    }
+
+    @SneakyThrows
+    public String getBearerToken() {
+        String apiUrl = tokenGenerationConfiguration.getToken_url();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.set("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        headers.set("Authorization", tokenGenerationConfiguration.getAuthorization());
+        String requestBody = tokenGenerationConfiguration.getGrant_type();
+
+        RestTemplate restTemplate = new RestTemplate();
+        RequestEntity<String> requestEntity = new RequestEntity<>(requestBody, headers, HttpMethod.POST, new URI(apiUrl));
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode responseJson = objectMapper.readTree(responseEntity.getBody());
+                String access_token = responseJson.get("access_token").asText();
+                return access_token;
+            } catch (JsonProcessingException e) {
+                throw new RestClientException("Api Call to getBearerToken failed ", e);
+            }
+        }
+        return null;
+    }
+
+    public HttpHeaders getHttpHeaders(String bearerToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + bearerToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
+    }
+}
+
+
+
+//call client generate token 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public SfdcMainResponse SFDEnquiryClientAPI(TAEnquiryDetailRequest taEnquiryDetailRequest) throws IOException {
+        log.info("Calling SFDC API");
+        String bearerToken = tokenGeneration.getBearerToken();
+        ObjectMapper objectMapper;
+        HttpEntity<TAEnquiryDetailRequest> requestBody = new HttpEntity<>(taEnquiryDetailRequest,
+                tokenGeneration.getHttpHeaders(bearerToken));
+
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(tAsfdcurl.getTasfdcUrl(), requestBody, String.class);
+            responseEntity = restTemplate.postForEntity(tAsfdcurl.getTasfdcUrl(), requestBody, String.class);
+            log.info("SFDC API HTTP Status Code: " + responseEntity.getStatusCode());
+            if (responseEntity.getStatusCode().is2xxSuccessful() || responseEntity.getStatusCode().is4xxClientError()) {
+                objectMapper = new ObjectMapper();
+                JsonNode responseJson = objectMapper.readTree(responseEntity.getBody());
+                SfdcMainResponse sfdcMainResponse = objectMapper.convertValue(responseJson, SfdcMainResponse.class);
+                log.info("Response Body: " + sfdcMainResponse);
+                saveData1(sfdcMainResponse,taEnquiryDetailRequest);
+                return sfdcMainResponse;
+            }else{
+                log.info(responseEntity.getBody());
+            }
+        } catch (HttpClientErrorException exception) {
+            log.error(exception.getMessage());
+            log.info(exception.getResponseBodyAsString());
+            objectMapper = new ObjectMapper();
+
+            JsonNode responseJson = objectMapper.readTree(exception.getResponseBodyAsString());
+            SfdcMainResponse sfdcMainResponse = objectMapper.convertValue(responseJson, SfdcMainResponse.class);
+            if (sfdcMainResponse.getStatus().equalsIgnoreCase("error"))
+            {
+                log.info("Response Body: " + sfdcMainResponse);
+                saveData1(sfdcMainResponse,taEnquiryDetailRequest);
+                return sfdcMainResponse;
+            }
+
