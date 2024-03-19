@@ -1,0 +1,35 @@
+  @Override
+    public HandOverRequestDetails saveCashierHandData(HandOverRequest cashierHandOverRequest) {
+        HandOverRequestDetails cashierHandOverRequestDetails = new HandOverRequestDetails();
+        Object[] a = null;                              
+             StoredProcedureQuery query = entityManager
+             .createStoredProcedureQuery("mmfdba.prc_employee_cash_limit_rcpt");
+             query.registerStoredProcedureParameter("1", String.class, ParameterMode.IN);
+             query.registerStoredProcedureParameter("2", String.class, ParameterMode.IN);
+             query.registerStoredProcedureParameter("3", String.class, ParameterMode.OUT);
+
+            query.setParameter("1", cashierHandOverRequest.getEmpCode());
+            query.setParameter("2", cashierHandOverRequest.getHandoverStatus());
+            query.execute();  
+
+            a = query.getResultList().toArray();
+            log.info("message " + a);
+
+            return cashierHandOverRequestDetails;
+        }
+      
+    }
+
+
+
+
+  @PostMapping(path = "/saveGetHandOverdata", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> saveGetHandOverData(@RequestBody HandOverRequest cashierHandRequest) {
+        // if (cashierHandRequest.getEmpCode() == null || cashierHandRequest.getEmpCode().isEmpty()) {
+        //     return new ResponseEntity<>("EmpCode is mandatory", HttpStatus.BAD_REQUEST);
+        // } else if (cashierHandRequest.getHandoverStatus() == null || cashierHandRequest.getHandoverStatus().isEmpty()) {
+        //     return new ResponseEntity<>("HandoverStatus is mandatory", HttpStatus.BAD_REQUEST);
+        // } else {
+            SuccessResponse<?> successResponse = new SuccessResponse<>( getHandOverService.saveCashierHandData(cashierHandRequest));
+            return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        }
