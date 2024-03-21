@@ -1,0 +1,34 @@
+jsx - javascript xml -allow write .jsx folder under js + html
+
+Normal JS  -we write html code in string parameter and then set this parameter display -means set steps
+
+But
+ReactJS: provide jsx direclty anything html code write under jsx return
+
+jsx converted regular js.
+babel library -convert this jsx to js
+
+how to work internally 
+index.html ->y
+
+
+Dynamic-Component:
+jsx allow creation dyncamic and indteractive UI component.
+using {} we can embed any js expression.
+
+
+Reausable Component:
+Modularity: easy reuse across difficult
+Consisitency : UI consistency
+Efficiency : avoiding duplication code
+
+
+How to used Bootstrap or tailwind
+external library
+
+   -  npm i install bootstrap@5.3.3
+   - import "bootstrap/dist/css/bootstrap.min.css";
+# import
+# import "bootstrap/dist/css/bootstrap.min.css";
+
+
