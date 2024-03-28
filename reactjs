@@ -39,3 +39,10 @@ Accessed with props.children
 can be any content:strings, numbers,JSX,or component
 
 
+Handling Event:
+ React events use camelCase e.g onClick
+ Uses synthetic events,not direct browser event
+ Event handlers can be function or  or arrow functions
+
+
+
