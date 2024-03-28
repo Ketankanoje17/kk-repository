@@ -31,4 +31,11 @@ external library
 # import
 # import "bootstrap/dist/css/bootstrap.min.css";
 
+passing Children:- 
+children is a special prop for passing elements into compnents
+Used for flexible and reausable component design
+common in layout  or container component
+Accessed with props.children
+can be any content:strings, numbers,JSX,or component
+
 
