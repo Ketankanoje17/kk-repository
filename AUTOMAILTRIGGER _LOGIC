@@ -1,0 +1,234 @@
+package com.arms.automailer.Auto_Mail_Trigger.service;
+
+import com.arms.automailer.Auto_Mail_Trigger.dao.AutomailDetailsDao;
+import com.arms.automailer.Auto_Mail_Trigger.entities.AutoMailData;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class AutoMailService {
+
+    @Autowired
+    TemplateEngine templateEngine;
+
+
+    private final JavaMailSender emailSender;
+
+    @PersistenceContext
+    EntityManager entityManager;
+
+
+    @Value("${spring.mail.username}")
+    private String emailName;
+
+    public AutoMailService(JavaMailSender emailSender) {
+
+        this.emailSender = emailSender;
+    }
+
+
+    public TemplateEngine getTemplateEngine() {
+        return templateEngine;
+    }
+
+    public void setTemplateEngine(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
+
+    public String sendAutoMailDataviamail(List<AutoMailData> failedCases) {
+        List<String> response = new ArrayList<>();
+        Map<String, Map<String, List<AutoMailData>>> casesByEmail = new HashMap<>();
+
+        for (AutoMailData caseData : failedCases) {
+            addToEmailMap(casesByEmail, caseData.getAbmEmail(), caseData.getAbmSapCodeName(), caseData);
+            addToEmailMap(casesByEmail, caseData.getDmEmail(), caseData.getAbmSapCodeName(), caseData);
+            addToEmailMap(casesByEmail, caseData.getChEmail(), caseData.getAbmSapCodeName(), caseData);
+            addToEmailMap(casesByEmail, caseData.getBhEmail(), caseData.getAbmSapCodeName(), caseData);
+
+        }
+        for (Map.Entry<String, Map<String, List<AutoMailData>>> emailEntry : casesByEmail.entrySet()) {
+            String email = emailEntry.getKey();
+            Map<String, List<AutoMailData>> sapCodeGroups = emailEntry.getValue();
+            for (Map.Entry<String, List<AutoMailData>> sapEntry : sapCodeGroups.entrySet()) {
+                List<AutoMailData> autoMailDataList = sapEntry.getValue();
+                Context context = new Context();
+                context.setVariable("failedCases", autoMailDataList);
+                context.setVariable("date", autoMailDataList.get(0).getRepoDate());
+                String htmlContent = templateEngine.process("repoTemplate.html", context);
+                response.add(sendHtmlEmail(email, "GARAGE ENTRY PENDING", htmlContent, autoMailDataList));
+            }
+        }
+
+        return String.join("\n",response);
+    }
+
+    private void addToEmailMap(Map<String, Map<String, List<AutoMailData>>> groupedData, String email, String sapCode, AutoMailData data) {
+        if (email != null && !email.isEmpty() && sapCode != null && !sapCode.isEmpty()) {
+            groupedData.computeIfAbsent(email, k -> new HashMap<>())
+                    .computeIfAbsent(sapCode, k -> new ArrayList<>())
+                    .add(data);
+        }
+    }
+
+    private String sendHtmlEmail(String to, String subject, String htmlBody, List<AutoMailData> autoMailDataList) {
+        String response = null;
+        for (AutoMailData autoMailData1 : autoMailDataList) {
+            try {
+                response = "Successfully send email to " + to + "this email";
+                MimeMessage message = emailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                if (autoMailData1.getDmEmail() != "" || !autoMailData1.getDmEmail().equals("")) {
+                    helper.setTo(autoMailData1.getAbmEmail());
+                }
+                if (autoMailData1.getDmEmail() != "" || !autoMailData1.getDmEmail().equals("")) {
+                    helper.setCc(autoMailData1.getDmEmail());
+                }
+                if (autoMailData1.getChEmail() != "" || !autoMailData1.getChEmail().equals("")) {
+                    helper.setCc(autoMailData1.getChEmail());
+                }
+                if (autoMailData1.getBhEmail() != "" || !autoMailData1.getBhEmail().equals("")) {
+                    helper.setCc(autoMailData1.getBhEmail());
+                }
+                helper.setFrom(emailName);
+                helper.setSubject(subject);
+                helper.setText(htmlBody, true);
+                emailSender.send(message);
+                String saveAutoMailData=saveDataIntoAutoMailTrigger(autoMailDataList,htmlBody,subject);
+
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                response = "soemthing wend wrong while sending email to " + to + " this email";
+            }
+        }
+
+        return response;
+    }
+
+    public static String dateConvertDDMMYYY(String dt) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String dateInString = dt ;
+        java.util.Date date = null;
+        String dateStr="";
+        try {
+            date = sdf.parse(dateInString);
+            sdf.applyPattern("dd/MM/yyyy");
+            dateStr = sdf.format(date);
+        } catch (ParseException e) {
+            LocalDate date1 = LocalDate.parse(dt);
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String outputDate = date1.format(outputFormatter);
+            return outputDate;
+        }
+        return dateStr;
+    }
+
+//    public String saveDataIntoAutoMailTrigger(List<AutoMailData> autoMailData1,String htmlContent,String subject) {
+//        Session session = null;
+//        String response = "";
+//        try {
+//            session = entityManager.unwrap(Session.class);
+//            session.doWork(new Work() {
+//                public void execute(Connection connection) throws SQLException {
+//                    String flag = "A";
+//                    CallableStatement callableStatement = connection.prepareCall(
+//                            "INSERT INTO ACRS_EMAIL_LOG (CONTRACT_NUMBER,REPO_ID,DESIGNATION_TYPE,EMAIL_MSG,MAIL_TO_ID,MAIL_CC_ID,ENTRY_DATE,EMAIL_SUBJECT,FILE_STORE_PATH,ENTRY_BY) VALUES(?,?,?,?,?,?,?,?,?,?)");
+//
+//                    for(AutoMailData autoMailData: autoMailData1) {
+//                        LocalDate myObj = LocalDate.now();
+//                        callableStatement.setString(1, autoMailData.getHpaNo());
+//                        callableStatement.setString(2, autoMailData.getRepoId());
+//                        callableStatement.setString(3, autoMailData.getRequestName());
+//                        callableStatement.setString(4, htmlContent);
+//                        callableStatement.setString(5,"");
+//                        callableStatement.setString(6, "");
+//                        callableStatement.setString(7, dateConvertDDMMYYY(String.valueOf(myObj)));
+//                        callableStatement.setString(8, subject);
+//                        callableStatement.setString(9, "");
+//                        callableStatement.setString(10, "");
+//                        callableStatement.execute();
+//                    }
+//                }
+//            });
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        } finally {
+//            entityManager.unwrap(Session.class);
+//        }
+//        return response;
+//
+//    }
+
+    public String saveDataIntoAutoMailTrigger(List<AutoMailData> autoMailData1, String htmlContent, String subject) {
+        String response = "";
+        try {
+            Session session = entityManager.unwrap(Session.class);
+            session.doWork(conn -> {
+                Connection connection = null;
+                CallableStatement callableStatement = null;
+                try {
+                    connection = conn;
+                    connection.setAutoCommit(true);
+                    String sql = "INSERT INTO ACRS_EMAIL_LOG " +
+                            "(CONTRACT_NUMBER, REPO_ID, DESIGNATION_TYPE, EMAIL_MSG, MAIL_TO_ID, MAIL_CC_ID, ENTRY_DATE, EMAIL_SUBJECT, FILE_STORE_PATH, ENTRY_BY) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    callableStatement = connection.prepareCall(sql);
+                    for (AutoMailData autoMailData : autoMailData1) {
+                        LocalDate currentDate = LocalDate.now();
+                        callableStatement.setString(1, autoMailData.getHpaNo());
+                        callableStatement.setString(2, autoMailData.getRepoId());
+                        callableStatement.setString(3, autoMailData.getRequestName());
+                        callableStatement.setString(4, htmlContent);
+                        callableStatement.setString(5, "");
+                        callableStatement.setString(6, "");
+                        callableStatement.setString(7, dateConvertDDMMYYY(String.valueOf(currentDate)));
+                        callableStatement.setString(8, subject);
+                        callableStatement.setString(9, "");
+                        callableStatement.setString(10, "AUTO TRIGGER");
+                        callableStatement.executeUpdate();
+                    }
+                } finally {
+                    if (callableStatement != null) callableStatement.close();
+                    if (connection != null) connection.setAutoCommit(false);
+                }
+            });
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return response;
+    }
+
+}
+
+
+
+
+		implementation("org.springframework.boot:spring-boot-starter-mail")
+      implementation("jakarta.mail:jakarta.mail-api:2.1.2")
+		implementation("org.modelmapper:modelmapper:3.1.0")
+		implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
