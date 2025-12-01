@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report9" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0" uuid="7af1bbbe-7f49-43c6-91f2-0bdfdc9cb493">
+	<property name="ireport.zoom" value="1.3286707500000008"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="580"/>
+	<parameter name="headerPath" class="java.lang.String"/>
+	<parameter name="footerPath" class="java.lang.String"/>
+	<parameter name="imagePath" class="java.lang.String"/>
+	<parameter name="contractBranch" class="java.lang.String"/>
+	<parameter name="entryDate" class="java.lang.String"/>
+	<parameter name="bodyLine1" class="java.lang.String"/>
+	<parameter name="bodyLine2" class="java.lang.String"/>
+	<parameter name="age" class="java.lang.String"/>
+	<parameter name="custName" class="java.lang.String"/>
+	<parameter name="subjectPolice1" class="java.lang.String"/>
+	<parameter name="branchAddress" class="java.lang.String"/>
+	<parameter name="employeeCode" class="java.lang.String"/>
+	<parameter name="employeeName" class="java.lang.String"/>
+	<field name="contractNumber" class="java.lang.String"/>
+	<field name="make" class="java.lang.String"/>
+	<field name="registrationNumber" class="java.lang.String"/>
+	<field name="engineNumber" class="java.lang.String"/>
+	<field name="chassisNumber" class="java.lang.String"/>
+	<detail>
+		<band height="125">
+			<line>
+				<reportElement x="0" y="108" width="555" height="1" uuid="366b9baa-5179-4485-b3ae-b641a292e82c"/>
+			</line>
+			<image>
+				<reportElement x="-7" y="-2" width="581" height="113" uuid="1c6686e8-905a-48fc-b71b-e1e75025503f"/>
+				<imageExpression><![CDATA[$P{headerPath}]]></imageExpression>
+			</image>
+		</band>
+		<band height="58">
+			<staticText>
+				<reportElement x="284" y="0" width="77" height="23" uuid="06cb8e97-a4ec-46ef-a00a-88d5cc35a635"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Contract Branch]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="23" width="77" height="13" uuid="f6d02dd8-0c07-4962-8ae7-81a7266b2935"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="375" y="-1" width="180" height="23" uuid="6c87f7e8-5628-44aa-9d1a-19b0d644dda9"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{contractBranch}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="376" y="22" width="178" height="13" uuid="9d2a2682-8632-4276-a233-023d666cc891"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{entryDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="361" y="0" width="16" height="22" uuid="0c805b0a-7a10-42dd-b20f-2d0bf3517f10"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="361" y="22" width="16" height="12" uuid="9bc8a7f6-0081-4b14-84c1-5a66935b9e42"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+		<band height="373">
+			<staticText>
+				<reportElement x="32" y="5" width="16" height="13" uuid="bd9aed9f-a867-4422-bfa4-9e4338e2853e"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[To,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="47" y="250" width="97" height="13" uuid="23d59c9c-dbca-4ba5-b548-63695d3c2f56"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Dear Sir,]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="182" width="93" height="13" uuid="f02acd77-8bf6-4699-bc63-72c933325b4a"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Engine No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="146" width="93" height="13" uuid="542f6958-992b-4376-8ad2-1cbf6bc88949"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Vehicle Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="110" width="93" height="13" uuid="92066661-c9a9-43bf-8c72-13994b6a905d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Contract No. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="164" width="93" height="13" uuid="e5138430-0ada-441b-89f0-d4a034c44f11"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Registration No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="200" width="93" height="13" uuid="6158e51e-dd1c-458e-bec8-dd326cdf0f23"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Chassis No.]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="110" width="200" height="13" uuid="6cdc5724-e5d8-498e-96aa-b078440e0894"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{contractNumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="146" width="200" height="13" uuid="e893d02a-585a-464e-a4fa-b1396bc46a6d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{make}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="164" width="200" height="13" uuid="fa242030-2ef4-4bc6-b28f-5e9524bd2a13"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{registrationNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="188" y="182" width="200" height="13" uuid="18a48787-2a13-4475-9248-5f85f80fd237"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{engineNumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="200" width="200" height="13" uuid="5e196bb2-3235-4977-9451-57932e71239f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{chassisNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="175" y="110" width="12" height="13" uuid="f900e981-a22c-4acd-abc9-92339af95df7"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="146" width="12" height="13" uuid="a2552cb2-ab99-4e16-985f-cddeeaa4586d"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="164" width="12" height="13" uuid="fe20caba-8976-42d9-b825-5322c996a52c"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="182" width="12" height="13" uuid="97f64b6c-38b5-43ab-a17d-ef19762b9096"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="200" width="12" height="13" uuid="72ebf365-c721-43d5-bdb6-842bfd467cd3"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="47" y="266" width="508" height="67" uuid="2e4d3441-468c-4cd6-b543-99b543954799"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[This is to inform that as the above customer was unable to pay the loan instalments as per due date, he has surrendered the vehicle peacefully. The vehicle is in our custody and will be disposed off as per the Terms and conditions of the loan agreement.  The copy of the surrender letter signed by the customer is attached herewith.
+This is for your information and records.
+]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="188" y="128" width="367" height="15" uuid="60e7c0a4-e511-4a07-b377-32df0895344c"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{custName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="19" width="329" height="13" uuid="59aa0ecc-1597-4acb-9505-c41d3b6b1bbb"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Police Station Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="128" width="12" height="13" uuid="a93d4f7e-1d82-4736-84b3-638c12a4891b"/>
+				<textElement textAlignment="Left">
+					<font fontName="Times New Roman" size="9" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="83" y="128" width="93" height="13" uuid="ab0cf01b-85aa-44a6-881c-22d1f9f286d9"/>
+				<textElement>
+					<font fontName="Times New Roman" size="11" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Customer Name]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="32" y="73" width="515" height="23" uuid="b0fe5fc2-3e49-4a6d-85d5-33718201994c"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" isItalic="false" isUnderline="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{subjectPolice1}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="130">
+			<staticText>
+				<reportElement x="33" y="13" width="355" height="15" uuid="17610635-83fd-44a0-80ab-77ef1d34fd57"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[For Mahindra & Mahindra Financial Services Limited]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="45" width="111" height="15" uuid="668d583d-9f92-4225-ab49-98b28eb85179"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Employee Name:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="60" width="111" height="15" uuid="2c59e043-f1fb-4420-9f8b-952bf72836b2"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Employee Sap code:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="145" y="45" width="367" height="15" uuid="0c673877-b069-4c8b-8be1-26106b360f19"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{employeeName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="60" width="367" height="15" uuid="8d176621-d3a0-46d8-a4ff-1c5c79265361"/>
+				<textElement>
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{employeeCode}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="156">
+			<line>
+				<reportElement x="0" y="3" width="555" height="1" uuid="e51f5404-9334-4294-8613-703abda393fd"/>
+			</line>
+			<staticText>
+				<reportElement x="39" y="11" width="137" height="12" uuid="f46ad52c-2b47-4baf-9c8d-6fccfaa8ace7"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[MMFSL branch address  :]]></text>
+			</staticText>
+			<image>
+				<reportElement x="-7" y="43" width="581" height="96" uuid="f897d7b0-d34e-4da3-ab37-43f52d38b2f1"/>
+				<imageExpression><![CDATA[$P{footerPath}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="39" y="23" width="473" height="36" uuid="c531137d-377d-45dd-9f3b-e26179ee826d"/>
+				<textElement>
+					<font fontName="Arial" size="8" pdfFontName="Helvetica-Bold"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{branchAddress}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
